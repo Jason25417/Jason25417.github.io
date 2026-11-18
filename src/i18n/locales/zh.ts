@@ -52,7 +52,7 @@ const zh: Dictionary = {
   },
   about: {
     title: '关于',
-    description: 'Jason Tu 是谁、怎么工作，以及还能在哪里找到他。',
+    description: 'Jason Tu 是谁，以及还能在哪里找到他。',
     elsewhere: '其他地方',
     developerPage: 'App Store 开发者主页',
   },

@@ -257,7 +257,11 @@ const year = new Date().getFullYear();
                 locales.map((target) => (
                   <li>
                     <a
-                      href={localizePath(path, target)}
+                      href={
+                        notFound && target === defaultLocale
+                          ? '/404.html'
+                          : localizePath(path, target)
+                      }
                       lang={localeInfo[target].tag}
                       hreflang={localeInfo[target].tag}
                       data-set-language={target}

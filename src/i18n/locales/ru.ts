@@ -53,7 +53,7 @@ const ru: Dictionary = {
   },
   about: {
     title: 'Обо мне',
-    description: 'Кто такой Jason Tu, как он работает и где ещё его найти.',
+    description: 'Кто такой Jason Tu и где ещё его найти.',
     elsewhere: 'Ссылки',
     developerPage: 'Страница разработчика в App Store',
   },

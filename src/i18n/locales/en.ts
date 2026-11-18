@@ -63,7 +63,7 @@ const en = {
   about: {
     title: 'About',
     description:
-      'Who Jason Tu is, how he works, and where else to find him.',
+      'Who Jason Tu is and where else to find him.',
     elsewhere: 'Elsewhere',
     developerPage: 'App Store developer page',
   },

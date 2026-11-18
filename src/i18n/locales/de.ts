@@ -54,7 +54,7 @@ const de: Dictionary = {
   },
   about: {
     title: 'Über mich',
-    description: 'Wer Jason Tu ist, wie er arbeitet und wo man ihn sonst findet.',
+    description: 'Wer Jason Tu ist und wo man ihn sonst findet.',
     elsewhere: 'Anderswo',
     developerPage: 'Entwicklerseite im App Store',
   },

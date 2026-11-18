@@ -52,7 +52,7 @@ const ko: Dictionary = {
   },
   about: {
     title: '소개',
-    description: 'Jason Tu가 어떤 사람이고, 어떻게 일하며, 또 어디에서 찾을 수 있는지.',
+    description: 'Jason Tu가 어떤 사람이고, 또 어디에서 찾을 수 있는지.',
     elsewhere: '링크',
     developerPage: 'App Store 개발자 페이지',
   },

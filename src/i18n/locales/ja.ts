@@ -53,7 +53,7 @@ const ja: Dictionary = {
   },
   about: {
     title: 'プロフィール',
-    description: 'Jason Tu がどんな人で、どう働き、ほかにどこで見つかるか。',
+    description: 'Jason Tu がどんな人で、ほかにどこで見つかるか。',
     elsewhere: 'リンク',
     developerPage: 'App Store デベロッパページ',
   },
