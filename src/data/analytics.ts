@@ -7,6 +7,6 @@
  */
 export const analytics = {
   script: 'https://cloud.umami.is/script.js',
-  websiteId: '',
+  websiteId: 'f443ca3d-bd10-4feb-b1ce-1538b52f3049',
   domains: 'jasontu.dev',
 };
