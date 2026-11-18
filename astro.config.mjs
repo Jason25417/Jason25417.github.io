@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://jason25417.github.io',
+  site: 'https://jasontu.dev',
   markdown: {
     shikiConfig: {
       themes: {

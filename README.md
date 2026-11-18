@@ -59,5 +59,7 @@ Apps. The home page has its own short summary and does not read this file.
 can be run manually from the Actions tab. In the repository settings, set
 Pages → Build and deployment → Source to **GitHub Actions**.
 
-The site is configured for the root path `https://jason25417.github.io/`, so
-there is no `base` prefix; internal links start with `/`.
+The site is served at `https://jasontu.dev/` (custom domain set in the
+repository's Pages settings; DNS is on Cloudflare, records set to DNS only).
+`https://jason25417.github.io/` redirects there. There is no `base` prefix;
+internal links start with `/`.
