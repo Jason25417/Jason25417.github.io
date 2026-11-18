@@ -58,6 +58,9 @@ const es: Dictionary = {
     elsewhere: 'En otros sitios',
     developerPage: 'Página de desarrollador en el App Store',
   },
+  footer: {
+    privacy: 'Sin cookies. Las visitas se cuentan de forma anónima.',
+  },
   notFound: {
     title: 'Página no encontrada',
     description:

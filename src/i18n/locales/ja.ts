@@ -57,6 +57,9 @@ const ja: Dictionary = {
     elsewhere: 'リンク',
     developerPage: 'App Store デベロッパページ',
   },
+  footer: {
+    privacy: 'Cookie は使用していません。アクセスは匿名で集計しています。',
+  },
   notFound: {
     title: 'ページが見つかりません',
     description:

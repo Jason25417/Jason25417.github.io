@@ -982,6 +982,9 @@ main {
 }
 
 .footer-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.2rem;
   margin: 0;
 }
 

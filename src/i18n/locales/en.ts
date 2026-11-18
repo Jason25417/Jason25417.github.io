@@ -67,6 +67,9 @@ const en = {
     elsewhere: 'Elsewhere',
     developerPage: 'App Store developer page',
   },
+  footer: {
+    privacy: 'No cookies. Visits are counted anonymously.',
+  },
   notFound: {
     title: 'Page not found',
     description: "That page isn't here. Start from the home page, work, or notes.",

@@ -56,6 +56,9 @@ const zh: Dictionary = {
     elsewhere: '其他地方',
     developerPage: 'App Store 开发者主页',
   },
+  footer: {
+    privacy: '本站不使用 cookie，访问量为匿名统计。',
+  },
   notFound: {
     title: '页面不存在',
     description: '这个页面不存在。可以从首页、作品或笔记开始浏览。',

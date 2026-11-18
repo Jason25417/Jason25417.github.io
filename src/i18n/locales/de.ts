@@ -58,6 +58,9 @@ const de: Dictionary = {
     elsewhere: 'Anderswo',
     developerPage: 'Entwicklerseite im App Store',
   },
+  footer: {
+    privacy: 'Keine Cookies. Besuche werden anonym gezählt.',
+  },
   notFound: {
     title: 'Seite nicht gefunden',
     description:

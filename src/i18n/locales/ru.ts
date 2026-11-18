@@ -57,6 +57,9 @@ const ru: Dictionary = {
     elsewhere: 'Ссылки',
     developerPage: 'Страница разработчика в App Store',
   },
+  footer: {
+    privacy: 'Без cookie. Посещения считаются анонимно.',
+  },
   notFound: {
     title: 'Страница не найдена',
     description: 'Такой страницы нет. Начните с главной, работ или заметок.',

@@ -56,6 +56,9 @@ const ko: Dictionary = {
     elsewhere: '링크',
     developerPage: 'App Store 개발자 페이지',
   },
+  footer: {
+    privacy: '쿠키를 쓰지 않습니다. 방문은 익명으로 집계됩니다.',
+  },
   notFound: {
     title: '페이지를 찾을 수 없습니다',
     description: '찾으시는 페이지가 없습니다. 홈, 작업, 노트에서 시작해 보세요.',

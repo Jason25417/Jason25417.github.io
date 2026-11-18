@@ -26,6 +26,7 @@ import {
   type Locale,
 } from '../i18n';
 import { links } from '../data/links';
+import { analytics } from '../data/analytics';
 
 interface Props {
   title?: string;
@@ -112,6 +113,11 @@ const year = new Date().getFullYear();
               localStorage.setItem('language', choice.dataset.setLanguage);
             } catch (error) {}
           }
+          // Statistics: which links leading off the site get followed.
+          var link = target.closest && target.closest('a[href^="http"]');
+          if (link && link.host !== location.host && window.umami) {
+            window.umami.track('outbound', { url: link.href });
+          }
           var menus = document.querySelectorAll('details.language[open]');
           for (var i = 0; i < menus.length; i++) {
             if (!menus[i].contains(target)) menus[i].open = false;
@@ -125,6 +131,21 @@ const year = new Date().getFullYear();
             menu.querySelector('summary').focus();
           }
         });
+
+        // Statistics: a visitor sent on to their own language would otherwise
+        // look as if they came from this site. The address they really came
+        // from is carried across the redirect and reported once.
+        var carried = 'entry-referrer';
+        window.restoreEntryReferrer = function (type, payload) {
+          try {
+            var from = sessionStorage.getItem(carried);
+            if (from && payload) {
+              payload.referrer = from;
+              sessionStorage.removeItem(carried);
+            }
+          } catch (error) {}
+          return payload;
+        };
 
         if (!mode) return;
 
@@ -150,6 +171,11 @@ const year = new Date().getFullYear();
         if (!wanted || wanted === fallback) return;
 
         if (mode === 'redirect') {
+          try {
+            if (document.referrer && document.referrer.indexOf(location.origin) !== 0) {
+              sessionStorage.setItem(carried, document.referrer);
+            }
+          } catch (error) {}
           location.replace(
             '/' + wanted + location.pathname + location.search + location.hash,
           );
@@ -176,6 +202,19 @@ const year = new Date().getFullYear();
           .catch(function () {});
       })();
     </script>
+    {
+      analytics.websiteId && (
+        <script
+          is:inline
+          defer
+          src={analytics.script}
+          data-website-id={analytics.websiteId}
+          data-domains={analytics.domains}
+          data-do-not-track="true"
+          data-before-send="restoreEntryReferrer"
+        />
+      )
+    }
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Jason Tu" />
@@ -265,6 +304,8 @@ const year = new Date().getFullYear();
                       lang={localeInfo[target].tag}
                       hreflang={localeInfo[target].tag}
                       data-set-language={target}
+                      data-umami-event="language"
+                      data-umami-event-to={target}
                       aria-current={target === locale ? 'true' : undefined}
                     >
                       {localeInfo[target].name}
@@ -286,7 +327,10 @@ const year = new Date().getFullYear();
 
     <footer class="site-footer">
       <div class="shell">
-        <p class="footer-note">© {year} Jason Tu</p>
+        <p class="footer-note">
+          © {year} Jason Tu
+          <span class="footer-privacy">{t.footer.privacy}</span>
+        </p>
         <ul class="footer-links">
           <li><a href={links.github.href} rel="me">GitHub</a></li>
           <li><a href={links.appStoreDeveloper.href}>App Store</a></li>
