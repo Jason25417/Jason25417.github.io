@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="Jason Tu studies mathematics and data analytics at The Ohio State University and works on dynamical systems, Rust infrastructure, and Apple apps."
+>
+  <header class="page-head">
+    <h1>About</h1>
+  </header>
+
+  <div class="prose">
+    <p>
+      I'm Jason Tu, an undergraduate at The Ohio State University studying
+      mathematics (honors, theory track) and data analytics.
+    </p>
+    <p>
+      My work runs along three lines. In research, I co-authored{' '}
+      <a href="https://arxiv.org/abs/2608.18426"
+        >A Relative Variational Principle for Expanding Iterated Function
+        Systems</a
+      >, published on arXiv in August 2026. In open source, I have 38 merged
+      pull requests into{' '}
+      <a href="https://github.com/fds-pmine/hotaru_mqtt">hotaru_mqtt</a> and its
+      parent Rust web framework{' '}
+      <a href="https://github.com/Field-of-Dream-Studio/hotaru">hotaru</a>,
+      covering MQTT v5 wire format and version negotiation, a runtime-agnostic
+      core, a no_std port, and broker hardening. I have had write access since
+      August 2026. In software, I build apps for Apple platforms:{' '}
+      <a
+        href="https://apps.apple.com/us/app/scritto-%E8%A8%80%E5%BD%95/id6787353058"
+        >Scritto</a
+      >, on-device transcription and translation;{' '}
+      <a
+        href="https://apps.apple.com/us/app/easyreminder-ics/id6789404034"
+        >EasyReminder ICS</a
+      >; and{' '}
+      <a
+        href="https://apps.apple.com/us/app/%E8%85%95%E8%AF%AD/id6787396039"
+        >腕语</a
+      >. All are free on the App Store.
+    </p>
+  </div>
+
+  <section class="about-aside" aria-labelledby="elsewhere">
+    <h2 class="group-title" id="elsewhere">Elsewhere</h2>
+    <ul class="links">
+      <li><a href="https://github.com/Jason25417">GitHub</a></li>
+      <li><a href="https://arxiv.org/abs/2608.18426">arXiv</a></li>
+      <li>
+        <a href="https://apps.apple.com/developer/id6785333743"
+          >App Store developer page</a
+        >
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

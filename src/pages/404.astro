@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="That page isn't here. Start from the home page, projects, or writing."
+>
+  <section class="notfound" aria-labelledby="notfound-title">
+    <p class="eyebrow">Error 404</p>
+    <h1 id="notfound-title">This page isn't here.</h1>
+    <p>
+      The address may have changed, or the page was never published. The home
+      page lists what there is.
+    </p>
+    <ul class="links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/writing/">Writing</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </section>
+</BaseLayout>

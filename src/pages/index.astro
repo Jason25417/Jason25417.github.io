@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <section class="intro" aria-labelledby="intro-title">
+    <p class="eyebrow">The Ohio State University</p>
+    <h1 id="intro-title">Jason Tu</h1>
+    <p class="lede">
+      Mathematics (honors, theory track) and data analytics at The Ohio State
+      University.
+    </p>
+  </section>
+
+  <div class="index">
+    <section class="row" aria-labelledby="home-research">
+      <h2 class="row-label" id="home-research">Research</h2>
+      <div class="row-body">
+        <p class="paper-title">
+          <a href="https://arxiv.org/abs/2608.18426"
+            >A Relative Variational Principle for Expanding Iterated Function
+            Systems</a
+          >
+        </p>
+        <p class="meta">
+          arXiv:2608.18426 [math.DS] · August 2026 · co-author
+        </p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="home-open-source">
+      <h2 class="row-label" id="home-open-source">Open source</h2>
+      <div class="row-body">
+        <p>
+          38 merged pull requests into <a
+            href="https://github.com/fds-pmine/hotaru_mqtt">hotaru_mqtt</a>{' '}
+          and its parent Rust web framework{' '}
+          <a href="https://github.com/Field-of-Dream-Studio/hotaru">hotaru</a>:
+          MQTT v5 wire format and version negotiation, a runtime-agnostic
+          core, a no_std port, and broker hardening.
+        </p>
+        <p class="meta">Write access since August 2026</p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="home-apps">
+      <h2 class="row-label" id="home-apps">Apps</h2>
+      <div class="row-body">
+        <ul class="plain-list">
+          <li>
+            <a
+              class="item-name"
+              href="https://apps.apple.com/us/app/scritto-%E8%A8%80%E5%BD%95/id6787353058"
+              >Scritto</a
+            >{' '}
+            <span class="dim">— on-device transcription and translation</span>
+          </li>
+          <li>
+            <a
+              class="item-name"
+              href="https://apps.apple.com/us/app/easyreminder-ics/id6789404034"
+              >EasyReminder ICS</a
+            >
+          </li>
+          <li>
+            <a
+              class="item-name"
+              href="https://apps.apple.com/us/app/%E8%85%95%E8%AF%AD/id6787396039"
+              >腕语</a
+            >
+          </li>
+        </ul>
+        <p class="meta">
+          Free on the App Store ·{' '}
+          <a href="https://apps.apple.com/developer/id6785333743"
+            >developer page</a
+          >
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <p class="section-foot"><a href="/projects/">All projects →</a></p>
+</BaseLayout>

@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { projects, appStoreDeveloperPage, type ProjectKind } from '../../data/projects';
+
+const kinds: ProjectKind[] = ['Research', 'Open source', 'Apps'];
+const anchor = (kind: string) => kind.toLowerCase().replace(/\s+/g, '-');
+---
+
+<BaseLayout
+  title="Projects"
+  description="Research, open-source work, and apps by Jason Tu."
+>
+  <header class="page-head">
+    <h1>Projects</h1>
+    <p class="lede">
+      A paper in dynamical systems, work on a Rust MQTT stack, and apps for
+      Apple platforms.
+    </p>
+  </header>
+
+  {
+    kinds.map((kind) => {
+      const items = projects.filter((project) => project.kind === kind);
+      return (
+        <section class="group" aria-labelledby={`group-${anchor(kind)}`}>
+          <h2 class="group-title" id={`group-${anchor(kind)}`}>
+            {kind}
+          </h2>
+
+          {items.map((project) => (
+            <article class="project" id={project.id}>
+              <div class="project-main">
+                <h3>{project.title}</h3>
+                {project.description && (
+                  <p class="project-desc">{project.description}</p>
+                )}
+                <ul class="links">
+                  {project.links.map((link) => (
+                    <li>
+                      <a href={link.href}>{link.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class="project-meta">
+                <span>{project.date}</span>
+                {project.note && (
+                  <span class="project-note">{project.note}</span>
+                )}
+              </div>
+            </article>
+          ))}
+
+          {kind === 'Apps' && (
+            <p class="meta group-note">
+              <a href={appStoreDeveloperPage}>App Store developer page →</a>
+            </p>
+          )}
+        </section>
+      );
+    })
+  }
+</BaseLayout>
