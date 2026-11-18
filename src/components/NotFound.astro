@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localizePath, useTranslations, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const places = [
+  { path: '/', label: t.nav.home },
+  { path: '/projects/', label: t.nav.projects },
+  { path: '/writing/', label: t.nav.writing },
+  { path: '/about/', label: t.nav.about },
+];
+---
+
+<BaseLayout
+  title={t.notFound.title}
+  description={t.notFound.description}
+  locale={locale}
+  path="/404/"
+  notFound
+>
+  <section class="notfound" aria-labelledby="notfound-title">
+    <p class="eyebrow">{t.notFound.eyebrow}</p>
+    <h1 id="notfound-title">{t.notFound.heading}</h1>
+    <p>{t.notFound.body}</p>
+    <ul class="links">
+      {
+        places.map((place) => (
+          <li>
+            <a href={localizePath(place.path, locale)}>{place.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

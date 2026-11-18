@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  formatMonth,
+  localeStaticPaths,
+  localizePath,
+  rich,
+  useTranslations,
+  type Locale,
+} from '../../i18n';
+import { links } from '../../data/links';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const t = useTranslations(locale);
+---
+
+<BaseLayout>
+  <section class="intro" aria-labelledby="intro-title">
+    <p class="eyebrow">{t.home.eyebrow}</p>
+    <h1 id="intro-title">Jason Tu</h1>
+    <p class="lede">{t.home.lede}</p>
+  </section>
+
+  <div class="index">
+    <section class="row" aria-labelledby="home-research">
+      <h2 class="row-label" id="home-research">{t.kinds.research}</h2>
+      <div class="row-body">
+        <p class="paper-title">
+          <a href={links.paper.href} lang={links.paper.lang}>{links.paper.label}</a>
+        </p>
+        <p class="meta">
+          arXiv:2608.18426 [math.DS] · {formatMonth('2026-08', locale)} · {
+            t.home.coauthor
+          }
+        </p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="home-open-source">
+      <h2 class="row-label" id="home-open-source">{t.kinds.openSource}</h2>
+      <div class="row-body">
+        <p set:html={rich(t.home.openSource)} />
+        <p class="meta">{t.home.writeAccess}</p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="home-apps">
+      <h2 class="row-label" id="home-apps">{t.kinds.apps}</h2>
+      <div class="row-body">
+        <ul class="plain-list">
+          <li>
+            <a class="item-name" href={links.scritto.href}>{links.scritto.label}</a>
+            <span class="dim"> — {t.home.scritto}</span>
+          </li>
+          <li>
+            <a class="item-name" href={links.easyReminder.href}
+              >{links.easyReminder.label}</a
+            >
+          </li>
+          <li>
+            <a class="item-name" href={links.wanyu.href} lang={links.wanyu.lang}
+              >{links.wanyu.label}</a
+            >
+          </li>
+        </ul>
+        <p class="meta" set:html={rich(t.home.appsNote)} />
+      </div>
+    </section>
+  </div>
+
+  <p class="section-foot">
+    <a href={localizePath('/projects/', locale)}>{t.home.allProjects} →</a>
+  </p>
+</BaseLayout>

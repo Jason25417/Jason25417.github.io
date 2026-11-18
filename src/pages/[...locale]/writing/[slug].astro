@@ -1,0 +1,80 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  defaultLocale,
+  formatDate,
+  localeInfo,
+  locales,
+  localizePath,
+  useTranslations,
+  type Locale,
+} from '../../../i18n';
+import { getPosts, type LocalizedPost } from '../../../i18n/posts';
+
+export async function getStaticPaths() {
+  const pages = [];
+  const perLocale = await Promise.all(
+    locales.map(async (locale) => ({ locale, posts: await getPosts(locale) })),
+  );
+  for (const { locale, posts } of perLocale) {
+    for (const post of posts) {
+      // Languages the post was really written in, for search engines.
+      const translatedIn = perLocale
+        .filter(({ posts: others }) =>
+          others.some((other) => other.slug === post.slug && !other.isFallback),
+        )
+        .map(({ locale: other }) => other);
+      pages.push({
+        params: {
+          locale: locale === defaultLocale ? undefined : locale,
+          slug: post.slug,
+        },
+        props: { locale, post, translatedIn },
+      });
+    }
+  }
+  return pages;
+}
+
+interface Props {
+  locale: Locale;
+  post: LocalizedPost;
+  translatedIn: Locale[];
+}
+
+const { locale, post, translatedIn } = Astro.props;
+const t = useTranslations(locale);
+const { Content } = await render(post.entry);
+const { title, description, date } = post.entry.data;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  translatedIn={translatedIn}
+  canonicalLocale={post.contentLocale}
+>
+  <article>
+    <header class="article-head">
+      <a class="back-link" href={localizePath('/writing/', locale)}
+        >← {t.writing.title}</a
+      >
+      <h1 lang={post.isFallback ? localeInfo[post.contentLocale].tag : undefined}>
+        {title}
+      </h1>
+      <p class="article-meta">
+        <time datetime={date.toISOString()}>{formatDate(date, locale)}</time>
+        {post.isFallback && <span>{t.writing.englishOnly}</span>}
+      </p>
+    </header>
+
+    <div
+      class="article-body prose"
+      lang={post.isFallback ? localeInfo[post.contentLocale].tag : undefined}
+    >
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

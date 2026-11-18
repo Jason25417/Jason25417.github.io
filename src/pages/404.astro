@@ -1,23 +1,9 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+/* The host serves this one file for every missing address, whatever its
+   language. It renders in English and then swaps in the visitor's language
+   from /<language>/404/ (see the script in BaseLayout). */
+import NotFound from '../components/NotFound.astro';
+import { defaultLocale } from '../i18n';
 ---
 
-<BaseLayout
-  title="Page not found"
-  description="That page isn't here. Start from the home page, projects, or writing."
->
-  <section class="notfound" aria-labelledby="notfound-title">
-    <p class="eyebrow">Error 404</p>
-    <h1 id="notfound-title">This page isn't here.</h1>
-    <p>
-      The address may have changed, or the page was never published. The home
-      page lists what there is.
-    </p>
-    <ul class="links">
-      <li><a href="/">Home</a></li>
-      <li><a href="/projects/">Projects</a></li>
-      <li><a href="/writing/">Writing</a></li>
-      <li><a href="/about/">About</a></li>
-    </ul>
-  </section>
-</BaseLayout>
+<NotFound locale={defaultLocale} />

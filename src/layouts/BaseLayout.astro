@@ -1,51 +1,204 @@
 ---
-import '@fontsource/public-sans/latin-400.css';
-import '@fontsource/public-sans/latin-500.css';
-import '@fontsource/public-sans/latin-600.css';
+import '@fontsource/source-sans-3/latin-400.css';
+import '@fontsource/source-sans-3/latin-500.css';
+import '@fontsource/source-sans-3/latin-600.css';
+import '@fontsource/source-sans-3/cyrillic-400.css';
+import '@fontsource/source-sans-3/cyrillic-500.css';
+import '@fontsource/source-sans-3/cyrillic-600.css';
 import '@fontsource/source-serif-4/latin-400.css';
 import '@fontsource/source-serif-4/latin-400-italic.css';
 import '@fontsource/source-serif-4/latin-600.css';
+import '@fontsource/source-serif-4/cyrillic-400.css';
+import '@fontsource/source-serif-4/cyrillic-400-italic.css';
+import '@fontsource/source-serif-4/cyrillic-600.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/ibm-plex-mono/cyrillic-400.css';
+import '@fontsource/ibm-plex-mono/cyrillic-500.css';
 import '../styles/global.css';
+import {
+  defaultLocale,
+  localeInfo,
+  locales,
+  localizePath,
+  splitPath,
+  useTranslations,
+  type Locale,
+} from '../i18n';
+import { links } from '../data/links';
 
 interface Props {
   title?: string;
   description?: string;
   type?: 'website' | 'article';
+  /** Language of the page; read from the URL when omitted. */
+  locale?: Locale;
+  /** Language-neutral path such as `/projects/`; read from the URL when omitted. */
+  path?: string;
+  /** Languages this page truly exists in (for search engines). Defaults to all. */
+  translatedIn?: readonly Locale[];
+  /** Language whose URL is the canonical one. Defaults to the page's own. */
+  canonicalLocale?: Locale;
+  /** The 404 page: kept out of search results, and it picks its own language. */
+  notFound?: boolean;
 }
 
+const fromUrl = splitPath(Astro.url.pathname);
 const {
   title,
-  description = 'Jason Tu — mathematics and data analytics at The Ohio State University, open-source work on Rust infrastructure, and apps for Apple platforms.',
   type = 'website',
+  locale = fromUrl.locale,
+  path = fromUrl.path,
+  translatedIn = locales,
+  canonicalLocale = locale,
+  notFound = false,
 } = Astro.props;
 
+const t = useTranslations(locale);
+const description = Astro.props.description ?? t.site.description;
+
 const pageTitle = title ? `${title} · Jason Tu` : 'Jason Tu';
-const canonical = new URL(Astro.url.pathname, Astro.site);
-const pathname = Astro.url.pathname;
+const absolute = (target: Locale) =>
+  new URL(localizePath(path, target), Astro.site).href;
+const canonical = absolute(canonicalLocale);
 
 const nav = [
-  { href: '/projects/', label: 'Projects' },
-  { href: '/writing/', label: 'Writing' },
-  { href: '/about/', label: 'About' },
+  { path: '/projects/', label: t.nav.projects },
+  { path: '/writing/', label: t.nav.writing },
+  { path: '/about/', label: t.nav.about },
 ];
+const isActive = (target: string) => path === target || path.startsWith(target);
 
-const isActive = (href: string) =>
-  pathname === href || pathname.startsWith(href);
+/* How the page chooses a language for a first-time visitor:
+   - unprefixed (English) pages send the visitor to their own language;
+   - the 404 page swaps its text in place, since any address can land on it;
+   - a page under a language code is shown as asked. */
+const autoLanguage = notFound
+  ? 'swap'
+  : locale === defaultLocale
+    ? 'redirect'
+    : undefined;
 
 const year = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang="en">
+<html
+  lang={localeInfo[locale].tag}
+  data-locales={locales.join(',')}
+  data-default-locale={defaultLocale}
+  data-auto-language={autoLanguage}
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        var supported = root.dataset.locales.split(',');
+        var fallback = root.dataset.defaultLocale;
+        var mode = root.dataset.autoLanguage;
+        var known = function (code) {
+          return supported.indexOf(code) > -1;
+        };
+
+        // A choice made in the language menu is remembered and outranks the browser's setting.
+        document.addEventListener('click', function (event) {
+          var target = event.target;
+          var choice = target.closest && target.closest('a[data-set-language]');
+          if (choice) {
+            try {
+              localStorage.setItem('language', choice.dataset.setLanguage);
+            } catch (error) {}
+          }
+          var menus = document.querySelectorAll('details.language[open]');
+          for (var i = 0; i < menus.length; i++) {
+            if (!menus[i].contains(target)) menus[i].open = false;
+          }
+        });
+        document.addEventListener('keydown', function (event) {
+          if (event.key !== 'Escape') return;
+          var menu = document.querySelector('details.language[open]');
+          if (menu) {
+            menu.open = false;
+            menu.querySelector('summary').focus();
+          }
+        });
+
+        if (!mode) return;
+
+        var wanted = null;
+        var prefix = location.pathname.split('/')[1];
+        if (mode === 'swap' && known(prefix)) wanted = prefix;
+        if (!wanted) {
+          try {
+            wanted = localStorage.getItem('language');
+          } catch (error) {}
+          if (!known(wanted)) wanted = null;
+        }
+        if (!wanted) {
+          var preferred =
+            navigator.languages && navigator.languages.length
+              ? navigator.languages
+              : [navigator.language || ''];
+          for (var i = 0; i < preferred.length && !wanted; i++) {
+            var code = String(preferred[i]).toLowerCase().split('-')[0];
+            if (known(code)) wanted = code;
+          }
+        }
+        if (!wanted || wanted === fallback) return;
+
+        if (mode === 'redirect') {
+          location.replace(
+            '/' + wanted + location.pathname + location.search + location.hash,
+          );
+          return;
+        }
+
+        fetch('/' + wanted + '/404/')
+          .then(function (response) {
+            return response.ok ? response.text() : Promise.reject();
+          })
+          .then(function (html) {
+            var page = new DOMParser().parseFromString(html, 'text/html');
+            var swap = function () {
+              root.lang = page.documentElement.lang;
+              document.title = page.title;
+              document.body.innerHTML = page.body.innerHTML;
+            };
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', swap);
+            } else {
+              swap();
+            }
+          })
+          .catch(function () {});
+      })();
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Jason Tu" />
-    <link rel="canonical" href={canonical} />
+    {
+      notFound ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <link rel="canonical" href={canonical} />
+          {translatedIn.map((target) => (
+            <link
+              rel="alternate"
+              hreflang={localeInfo[target].tag}
+              href={absolute(target)}
+            />
+          ))}
+          <link
+            rel="alternate"
+            hreflang="x-default"
+            href={absolute(defaultLocale)}
+          />
+        </>
+      )
+    }
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#f7f7f3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#101413" media="(prefers-color-scheme: dark)" />
@@ -54,30 +207,69 @@ const year = new Date().getFullYear();
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={localeInfo[locale].og} />
     <meta name="twitter:card" content="summary" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{t.a11y.skip}</a>
 
     <header class="site-header">
       <div class="shell">
-        <a class="wordmark" href="/">Jason Tu</a>
-        <nav aria-label="Primary">
-          <ul class="site-nav">
-            {
-              nav.map((item) => (
-                <li>
-                  <a
-                    href={item.href}
-                    aria-current={isActive(item.href) ? 'page' : undefined}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
+        <a class="wordmark" href={localizePath('/', locale)}>Jason Tu</a>
+        <div class="header-end">
+          <nav aria-label={t.a11y.primaryNav}>
+            <ul class="site-nav">
+              {
+                nav.map((item) => (
+                  <li>
+                    <a
+                      href={localizePath(item.path, locale)}
+                      aria-current={isActive(item.path) ? 'page' : undefined}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+
+          <details class="language">
+            <summary aria-label={`${t.a11y.language}: ${localeInfo[locale].name}`}>
+              <svg
+                class="language-icon"
+                viewBox="0 0 16 16"
+                width="13"
+                height="13"
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+              >
+                <circle cx="8" cy="8" r="6.4"></circle>
+                <path d="M1.6 8h12.8M8 1.6c2 2 2 10.8 0 12.8M8 1.6c-2 2-2 10.8 0 12.8"></path>
+              </svg>
+              <span aria-hidden="true">{localeInfo[locale].name}</span>
+            </summary>
+            <ul class="language-list">
+              {
+                locales.map((target) => (
+                  <li>
+                    <a
+                      href={localizePath(path, target)}
+                      lang={localeInfo[target].tag}
+                      hreflang={localeInfo[target].tag}
+                      data-set-language={target}
+                      aria-current={target === locale ? 'true' : undefined}
+                    >
+                      {localeInfo[target].name}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </details>
+        </div>
       </div>
     </header>
 
@@ -89,13 +281,11 @@ const year = new Date().getFullYear();
 
     <footer class="site-footer">
       <div class="shell">
-        <p style="margin: 0">© {year} Jason Tu</p>
+        <p class="footer-note">© {year} Jason Tu</p>
         <ul class="footer-links">
-          <li><a href="https://github.com/Jason25417" rel="me">GitHub</a></li>
-          <li>
-            <a href="https://apps.apple.com/developer/id6785333743">App Store</a>
-          </li>
-          <li><a href="https://arxiv.org/abs/2608.18426">arXiv</a></li>
+          <li><a href={links.github.href} rel="me">GitHub</a></li>
+          <li><a href={links.appStoreDeveloper.href}>App Store</a></li>
+          <li><a href={links.paper.href}>arXiv</a></li>
         </ul>
       </div>
     </footer>

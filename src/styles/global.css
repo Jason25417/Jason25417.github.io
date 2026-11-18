@@ -1,8 +1,10 @@
 /* Design plan
    Color  — paper and ink neutrals (slightly green-biased) with a spruce accent;
             a faint drafting grid marks empty areas.
-   Type   — Source Serif 4 for display, Public Sans for body,
-            IBM Plex Mono for labels, dates, and navigation.
+   Type   — Source Serif 4 for display, Source Sans 3 for body,
+            IBM Plex Mono for labels, dates, and navigation. These cover
+            Latin and Cyrillic; Chinese, Japanese, and Korean use each
+            reader's system typefaces (see "Scripts" below).
    Layout — one measured column; left-aligned index rows separated by hairlines,
             no card grid, no oversized hero. */
 
@@ -21,13 +23,16 @@
   --accent-wash: #dfe9e2;
   --grid: rgba(23, 27, 24, 0.055);
   --selection: #cfe0d5;
+  --shadow: rgba(23, 27, 24, 0.45);
 
+  --cjk-sans: sans-serif;
+  --cjk-serif: serif;
   --font-display: "Source Serif 4", "Iowan Old Style", "Palatino Linotype",
-    Palatino, Georgia, serif;
-  --font-body: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Helvetica, Arial, sans-serif;
+    Palatino, Georgia, var(--cjk-serif);
+  --font-body: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Helvetica, Arial, var(--cjk-sans);
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
-    monospace;
+    var(--cjk-sans), monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -59,7 +64,57 @@
     --accent-wash: #1e2d27;
     --grid: rgba(230, 234, 227, 0.055);
     --selection: #2f5145;
+    --shadow: rgba(0, 0, 0, 0.9);
   }
+}
+
+/* Scripts
+   The page's Latin faces stay first, so names and code look the same in
+   every language; these stacks supply the Han, kana, and Hangul glyphs. */
+
+:root:lang(zh) {
+  --cjk-sans: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC",
+    "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+  --cjk-serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC",
+    "PingFang SC", "Microsoft YaHei", serif;
+}
+
+:root:lang(ja) {
+  --cjk-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans CJK JP",
+    "Yu Gothic", Meiryo, sans-serif;
+  --cjk-serif: "Hiragino Mincho ProN", "Noto Serif CJK JP", "Yu Mincho", serif;
+}
+
+:root:lang(ko) {
+  --cjk-sans: "Apple SD Gothic Neo", "Noto Sans CJK KR", "Malgun Gothic",
+    sans-serif;
+  /* Korean system serifs are uneven across platforms; headings stay sans. */
+  --cjk-serif: "Apple SD Gothic Neo", "Noto Sans CJK KR", "Malgun Gothic",
+    sans-serif;
+}
+
+:root:lang(zh),
+:root:lang(ja),
+:root:lang(ko) {
+  --measure: 36em;
+  /* `ch` is a Latin digit's width, about half a Han character. */
+  --lede-measure: 28em;
+}
+
+:root:lang(ja) {
+  line-break: strict;
+}
+
+/* In the monospaced labels a space between Han text and digits is a full
+   cell wide; tighten it so "2026 年 8 月" reads as one phrase. */
+:root:lang(zh) :is(.meta, .project-meta, .eyebrow, .row-label, .group-title, .links, .site-nav, .section-foot, .article-meta, .post-link time, .empty-label, .back-link, .site-footer),
+:root:lang(ja) :is(.meta, .project-meta, .eyebrow, .row-label, .group-title, .links, .site-nav, .section-foot, .article-meta, .post-link time, .empty-label, .back-link, .site-footer),
+:root:lang(ko) :is(.meta, .project-meta, .eyebrow, .row-label, .group-title, .links, .site-nav, .section-foot, .article-meta, .post-link time, .empty-label, .back-link, .site-footer) {
+  word-spacing: -0.3em;
+}
+
+:root:lang(ko) {
+  word-break: keep-all;
 }
 
 *,
@@ -80,6 +135,7 @@ body {
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: 1.65;
+  overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -179,6 +235,13 @@ p {
   color: var(--accent);
 }
 
+.header-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.4rem;
+}
+
 .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -210,6 +273,85 @@ p {
   border-bottom-color: var(--accent);
 }
 
+/* Language menu */
+
+.language {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+.language summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0;
+  border-bottom: 1px solid transparent;
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.language summary::-webkit-details-marker {
+  display: none;
+}
+
+.language summary::after {
+  content: "";
+  width: 0.36em;
+  height: 0.36em;
+  margin-top: -0.2em;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.language summary:hover,
+.language[open] summary {
+  color: var(--fg);
+  border-bottom-color: var(--rule-strong);
+}
+
+.language-icon {
+  flex: none;
+}
+
+.language-list {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  z-index: 5;
+  min-width: 9.5rem;
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  background: var(--bg);
+  border: 1px solid var(--rule-strong);
+  box-shadow: 0 10px 28px -18px var(--shadow);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  letter-spacing: 0;
+}
+
+.language-list a {
+  display: block;
+  padding: 0.4rem 0.9rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.language-list a:hover {
+  background: var(--accent-wash);
+  color: var(--fg);
+}
+
+.language-list a[aria-current="true"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 main {
   padding-block: 0 clamp(2.5rem, 5vw, 4rem);
 }
@@ -238,7 +380,7 @@ main {
 
 .lede {
   margin: 0;
-  max-width: 44ch;
+  max-width: var(--lede-measure, 44ch);
   font-size: var(--text-lg);
   line-height: 1.5;
   text-wrap: pretty;
@@ -376,7 +518,7 @@ main {
 }
 
 .page-head .lede {
-  max-width: 52ch;
+  max-width: var(--lede-measure, 52ch);
   color: var(--muted);
   font-size: var(--text-lg);
 }
@@ -782,6 +924,10 @@ main {
   color: var(--faint);
 }
 
+.footer-note {
+  margin: 0;
+}
+
 .footer-links {
   display: flex;
   flex-wrap: wrap;
@@ -807,6 +953,11 @@ main {
 @media (max-width: 38rem) {
   .site-header .shell {
     gap: 0.5rem;
+  }
+
+  .header-end {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .intro {

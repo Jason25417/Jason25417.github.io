@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  formatMonth,
+  localeStaticPaths,
+  useTranslations,
+  type Locale,
+} from '../../../i18n';
+import { links } from '../../../data/links';
+import { projectKinds, projects, type ProjectText } from '../../../data/projects';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const t = useTranslations(locale);
+const texts: Record<string, ProjectText | undefined> = t.projects.items;
+---
+
+<BaseLayout title={t.projects.title} description={t.projects.description}>
+  <header class="page-head">
+    <h1>{t.projects.title}</h1>
+    <p class="lede">{t.projects.lede}</p>
+  </header>
+
+  {
+    projectKinds.map((kind) => (
+      <section class="group" aria-labelledby={`group-${kind}`}>
+        <h2 class="group-title" id={`group-${kind}`}>
+          {t.kinds[kind]}
+        </h2>
+
+        {projects
+          .filter((project) => project.kind === kind)
+          .map((project) => {
+            const text = texts[project.id];
+            return (
+              <article class="project" id={project.id}>
+                <div class="project-main">
+                  <h3 lang={text?.title ? undefined : project.titleLang}>
+                    {text?.title ?? project.title}
+                  </h3>
+                  {text?.description && (
+                    <p class="project-desc">{text.description}</p>
+                  )}
+                  <ul class="links">
+                    {project.links.map((link) => (
+                      <li>
+                        <a href={link.href}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="project-meta">
+                  {project.date && (
+                    <span>{formatMonth(project.date, locale)}</span>
+                  )}
+                  {project.free && <span>{t.projects.free}</span>}
+                  {text?.note && (
+                    <span class="project-note">{text.note}</span>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+
+        {kind === 'apps' && (
+          <p class="meta group-note">
+            <a href={links.appStoreDeveloper.href}>
+              {t.projects.developerPage} →
+            </a>
+          </p>
+        )}
+      </section>
+    ))
+  }
+</BaseLayout>
