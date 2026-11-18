@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  formatDate,
+  localeInfo,
+  localeStaticPaths,
+  localizePath,
+  rich,
+  useTranslations,
+  type Locale,
+} from '../../../i18n';
+import { getNotes } from '../../../i18n/content';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const t = useTranslations(locale);
+const notes = await getNotes(locale);
+---
+
+<BaseLayout title={t.notes.title} description={t.notes.description}>
+  <header class="page-head">
+    <h1>{t.notes.title}</h1>
+    <p class="lede">{t.notes.lede}</p>
+  </header>
+
+  {
+    notes.length > 0 ? (
+      <ul class="post-list">
+        {notes.map((note) => (
+          <li>
+            <a
+              class="post-link"
+              href={localizePath(`/notes/${note.slug}/`, locale)}
+            >
+              <time datetime={note.entry.data.date.toISOString()}>
+                {formatDate(note.entry.data.date, locale)}
+              </time>
+              <div
+                lang={
+                  note.isFallback
+                    ? localeInfo[note.contentLocale].tag
+                    : undefined
+                }
+              >
+                <h2>{note.entry.data.title}</h2>
+                <p>{note.entry.data.description}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="empty">
+        <p class="empty-label">{t.notes.emptyLabel}</p>
+        <h2>{t.notes.emptyTitle}</h2>
+        <p>{t.notes.emptyBody}</p>
+        <p set:html={rich(t.notes.emptyCode)} />
+      </div>
+    )
+  }
+</BaseLayout>

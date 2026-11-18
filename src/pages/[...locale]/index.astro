@@ -1,76 +1,122 @@
 ---
+import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
-  formatMonth,
+  fill,
+  formatDate,
+  localeInfo,
   localeStaticPaths,
   localizePath,
-  rich,
   useTranslations,
   type Locale,
 } from '../../i18n';
-import { links } from '../../data/links';
+import { getLocalizedEntry, getNotes } from '../../i18n/content';
+import { getWorkByLine } from '../../i18n/work';
 
 export const getStaticPaths = localeStaticPaths;
 
 const { locale } = Astro.props as { locale: Locale };
 const t = useTranslations(locale);
+
+const intro = await getLocalizedEntry('pages', 'home', locale);
+const now = await getLocalizedEntry('pages', 'now', locale);
+const { Content: Intro } = await render(intro.entry);
+const groups = await getWorkByLine(locale);
+const notes = (await getNotes(locale)).slice(0, 3);
+
+/** Marks text shown in English on a page in another language. */
+const langOf = (item: { isFallback: boolean; contentLocale: Locale }) =>
+  item.isFallback ? localeInfo[item.contentLocale].tag : undefined;
 ---
 
-<BaseLayout>
+<BaseLayout translatedIn={intro.translatedIn} canonicalLocale={intro.contentLocale}>
   <section class="intro" aria-labelledby="intro-title">
-    <p class="eyebrow">{t.home.eyebrow}</p>
     <h1 id="intro-title">Jason Tu</h1>
-    <p class="lede">{t.home.lede}</p>
+    <div class="intro-body" lang={langOf(intro)}>
+      <Intro />
+    </div>
   </section>
 
   <div class="index">
-    <section class="row" aria-labelledby="home-research">
-      <h2 class="row-label" id="home-research">{t.kinds.research}</h2>
+    <section class="row" aria-labelledby="home-now">
+      <h2 class="row-label" id="home-now">
+        <a href={localizePath('/now/', locale)}>{t.nav.now}</a>
+      </h2>
       <div class="row-body">
-        <p class="paper-title">
-          <a href={links.paper.href} lang={links.paper.lang}>{links.paper.label}</a>
-        </p>
+        {now.entry.data.summary && <p lang={langOf(now)}>{now.entry.data.summary}</p>}
         <p class="meta">
-          arXiv:2608.18426 [math.DS] · {formatMonth('2026-08', locale)} · {
-            t.home.coauthor
+          {
+            now.entry.data.updated && (
+              <>
+                {fill(t.common.updated, {
+                  date: formatDate(now.entry.data.updated, locale),
+                })}
+                {' · '}
+              </>
+            )
           }
+          <a href={localizePath('/now/', locale)}>{t.home.nowLink} →</a>
         </p>
       </div>
     </section>
 
-    <section class="row" aria-labelledby="home-open-source">
-      <h2 class="row-label" id="home-open-source">{t.kinds.openSource}</h2>
-      <div class="row-body">
-        <p set:html={rich(t.home.openSource)} />
-        <p class="meta">{t.home.writeAccess}</p>
-      </div>
-    </section>
+    {
+      groups.map(({ line, items }) => (
+        <section class="row" aria-labelledby={`home-${line}`}>
+          <h2 class="row-label" id={`home-${line}`}>
+            {t.lines[line]}
+          </h2>
+          <div class="row-body">
+            <ul class="work-list">
+              {items.map((item) => (
+                <li lang={langOf(item.page)}>
+                  <a
+                    class="item-name"
+                    href={localizePath(`/work/${item.id}/`, locale)}
+                  >
+                    {item.page.entry.data.title}
+                  </a>
+                  <span class="dim">{item.page.entry.data.summary}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ))
+    }
 
-    <section class="row" aria-labelledby="home-apps">
-      <h2 class="row-label" id="home-apps">{t.kinds.apps}</h2>
-      <div class="row-body">
-        <ul class="plain-list">
-          <li>
-            <a class="item-name" href={links.scritto.href}>{links.scritto.label}</a>
-            <span class="dim"> — {t.home.scritto}</span>
-          </li>
-          <li>
-            <a class="item-name" href={links.easyReminder.href}
-              >{links.easyReminder.label}</a
-            >
-          </li>
-          <li>
-            <a class="item-name" href={links.wanyu.href} lang={links.wanyu.lang}
-              >{links.wanyu.label}</a
-            >
-          </li>
-        </ul>
-        <p class="meta" set:html={rich(t.home.appsNote)} />
-      </div>
-    </section>
+    {
+      notes.length > 0 && (
+        <section class="row" aria-labelledby="home-notes">
+          <h2 class="row-label" id="home-notes">
+            <a href={localizePath('/notes/', locale)}>{t.nav.notes}</a>
+          </h2>
+          <div class="row-body">
+            <ul class="work-list">
+              {notes.map((note) => (
+                <li lang={langOf(note)}>
+                  <a
+                    class="item-name"
+                    href={localizePath(`/notes/${note.slug}/`, locale)}
+                  >
+                    {note.entry.data.title}
+                  </a>
+                  <span class="dim">{note.entry.data.description}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
   </div>
 
   <p class="section-foot">
-    <a href={localizePath('/projects/', locale)}>{t.home.allProjects} →</a>
+    <a href={localizePath('/work/', locale)}>{t.home.allWork} →</a>
+    {
+      notes.length > 0 && (
+        <a href={localizePath('/notes/', locale)}>{t.home.allNotes} →</a>
+      )
+    }
   </p>
 </BaseLayout>

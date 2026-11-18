@@ -77,3 +77,8 @@ export function formatDate(date: Date, locale: Locale): string {
     timeZone: 'UTC',
   }).format(date);
 }
+
+/** Fills `{name}` placeholders in a translated string. */
+export function fill(template: string, values: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (match, name: string) => values[name] ?? match);
+}

@@ -1,0 +1,49 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  fill,
+  formatDate,
+  localeInfo,
+  localeStaticPaths,
+  useTranslations,
+  type Locale,
+} from '../../../i18n';
+import { getLocalizedEntry } from '../../../i18n/content';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const t = useTranslations(locale);
+const page = await getLocalizedEntry('pages', 'now', locale);
+const { Content } = await render(page.entry);
+const { updated } = page.entry.data;
+---
+
+<BaseLayout
+  title={t.now.title}
+  description={t.now.description}
+  translatedIn={page.translatedIn}
+  canonicalLocale={page.contentLocale}
+>
+  <header class="page-head">
+    <h1>{t.now.title}</h1>
+    {
+      updated && (
+        <p class="meta">
+          <time datetime={updated.toISOString()}>
+            {fill(t.common.updated, { date: formatDate(updated, locale) })}
+          </time>
+        </p>
+      )
+    }
+    {page.isFallback && <p class="notice">{t.common.englishOnly}</p>}
+  </header>
+
+  <div
+    class="prose"
+    lang={page.isFallback ? localeInfo[page.contentLocale].tag : undefined}
+  >
+    <Content />
+  </div>
+</BaseLayout>

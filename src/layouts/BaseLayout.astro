@@ -63,8 +63,9 @@ const absolute = (target: Locale) =>
 const canonical = absolute(canonicalLocale);
 
 const nav = [
-  { path: '/projects/', label: t.nav.projects },
-  { path: '/writing/', label: t.nav.writing },
+  { path: '/work/', label: t.nav.work },
+  { path: '/notes/', label: t.nav.notes },
+  { path: '/now/', label: t.nav.now },
   { path: '/about/', label: t.nav.about },
 ];
 const isActive = (target: string) => path === target || path.startsWith(target);

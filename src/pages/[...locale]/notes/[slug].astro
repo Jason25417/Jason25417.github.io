@@ -1,0 +1,66 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  defaultLocale,
+  formatDate,
+  localeInfo,
+  locales,
+  localizePath,
+  useTranslations,
+  type Locale,
+} from '../../../i18n';
+import { getNotes, type Localized } from '../../../i18n/content';
+
+export async function getStaticPaths() {
+  const pages = [];
+  for (const locale of locales) {
+    for (const note of await getNotes(locale)) {
+      pages.push({
+        params: {
+          locale: locale === defaultLocale ? undefined : locale,
+          slug: note.slug,
+        },
+        props: { locale, note },
+      });
+    }
+  }
+  return pages;
+}
+
+interface Props {
+  locale: Locale;
+  note: Localized<'notes'>;
+}
+
+const { locale, note } = Astro.props;
+const t = useTranslations(locale);
+const { Content } = await render(note.entry);
+const { title, description, date } = note.entry.data;
+const contentLang = note.isFallback
+  ? localeInfo[note.contentLocale].tag
+  : undefined;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  translatedIn={note.translatedIn}
+  canonicalLocale={note.contentLocale}
+>
+  <article>
+    <header class="article-head">
+      <a class="back-link" href={localizePath('/notes/', locale)}>← {t.notes.title}</a>
+      <h1 lang={contentLang}>{title}</h1>
+      <p class="article-meta">
+        <time datetime={date.toISOString()}>{formatDate(date, locale)}</time>
+      </p>
+      {note.isFallback && <p class="notice">{t.common.englishOnly}</p>}
+    </header>
+
+    <div class="article-body prose" lang={contentLang}>
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

@@ -1,36 +1,48 @@
 ---
+import { render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import {
+  localeInfo,
   localeStaticPaths,
-  rich,
   useTranslations,
   type Locale,
 } from '../../../i18n';
+import { getLocalizedEntry } from '../../../i18n/content';
 import { links } from '../../../data/links';
 
 export const getStaticPaths = localeStaticPaths;
 
 const { locale } = Astro.props as { locale: Locale };
 const t = useTranslations(locale);
+const page = await getLocalizedEntry('pages', 'about', locale);
+const { Content } = await render(page.entry);
 ---
 
-<BaseLayout title={t.about.title} description={t.about.description}>
+<BaseLayout
+  title={t.about.title}
+  description={t.about.description}
+  translatedIn={page.translatedIn}
+  canonicalLocale={page.contentLocale}
+>
   <header class="page-head">
     <h1>{t.about.title}</h1>
+    {page.isFallback && <p class="notice">{t.common.englishOnly}</p>}
   </header>
 
-  <div class="prose">
-    <p>{t.about.intro}</p>
-    <p set:html={rich(t.about.body)} />
+  <div
+    class="prose"
+    lang={page.isFallback ? localeInfo[page.contentLocale].tag : undefined}
+  >
+    <Content />
   </div>
 
   <section class="about-aside" aria-labelledby="elsewhere">
     <h2 class="group-title" id="elsewhere">{t.about.elsewhere}</h2>
     <ul class="links">
-      <li><a href={links.github.href}>GitHub</a></li>
+      <li><a href={links.github.href} rel="me">GitHub</a></li>
       <li><a href={links.paper.href}>arXiv</a></li>
       <li>
-        <a href={links.appStoreDeveloper.href}>{t.projects.developerPage}</a>
+        <a href={links.appStoreDeveloper.href}>{t.about.developerPage}</a>
       </li>
     </ul>
   </section>

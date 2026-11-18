@@ -7,16 +7,15 @@ interface ExternalLink {
 }
 
 /**
- * Every outbound address the site's text refers to, in one place.
- * Translations point at these by key — `[link text](key)`, or `[](key)` to
- * use the default label — so a URL is never repeated across languages.
+ * Every outbound address the site's own pages refer to, in one place, so a
+ * URL is never repeated across languages. Used by the layout, by
+ * `src/data/work.ts`, and by `[text](key)` links in the language files.
  */
 export const links = {
   github: { href: 'https://github.com/Jason25417', label: 'GitHub' },
   paper: {
     href: 'https://arxiv.org/abs/2608.18426',
-    label: 'A Relative Variational Principle for Expanding Iterated Function Systems',
-    lang: 'en',
+    label: 'arXiv:2608.18426',
   },
   hotaruMqtt: {
     href: 'https://github.com/fds-pmine/hotaru_mqtt',
@@ -28,16 +27,43 @@ export const links = {
   },
   scritto: {
     href: 'https://apps.apple.com/us/app/scritto-%E8%A8%80%E5%BD%95/id6787353058',
-    label: 'Scritto',
+    label: 'App Store',
   },
   easyReminder: {
     href: 'https://apps.apple.com/us/app/easyreminder-ics/id6789404034',
-    label: 'EasyReminder ICS',
+    label: 'App Store',
   },
-  wanyu: {
-    href: 'https://apps.apple.com/us/app/%E8%85%95%E8%AF%AD/id6787396039',
-    label: '腕语',
-    lang: 'zh-Hans',
+  easyReminderSource: {
+    href: 'https://github.com/Jason25417/EasyReminder',
+    label: 'GitHub',
+  },
+  sotto: {
+    href: 'https://apps.apple.com/us/app/sotto-ai-chat-on-your-wrist/id6787396039',
+    label: 'App Store',
+  },
+  betterCalendarSource: {
+    href: 'https://github.com/Jason25417/BetterCalendar',
+    label: 'GitHub',
+  },
+  dashboardFleetKit: {
+    href: 'https://github.com/Jason25417/dashboard-fleet-kit',
+    label: 'dashboard-fleet-kit',
+  },
+  issueTreeDashboard: {
+    href: 'https://github.com/Jason25417/issue-tree-dashboard',
+    label: 'issue-tree-dashboard',
+  },
+  dshComposerTweaks: {
+    href: 'https://github.com/Jason25417/dsh-composer-tweaks',
+    label: 'dsh-composer-tweaks',
+  },
+  dshExternalBridge: {
+    href: 'https://github.com/Jason25417/dsh-external-bridge',
+    label: 'dsh-external-bridge',
+  },
+  dshSessionAutoRename: {
+    href: 'https://github.com/Jason25417/dsh-session-auto-rename',
+    label: 'dsh-session-auto-rename',
   },
   appStoreDeveloper: {
     href: 'https://apps.apple.com/developer/id6785333743',

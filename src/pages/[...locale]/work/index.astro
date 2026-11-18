@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  formatMonth,
+  localeInfo,
+  localeStaticPaths,
+  localizePath,
+  useTranslations,
+  type Locale,
+} from '../../../i18n';
+import { getWorkByLine } from '../../../i18n/work';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const t = useTranslations(locale);
+const groups = await getWorkByLine(locale);
+---
+
+<BaseLayout title={t.work.title} description={t.work.description}>
+  <header class="page-head">
+    <h1>{t.work.title}</h1>
+    <p class="lede">{t.work.lede}</p>
+  </header>
+
+  {
+    groups.map(({ line, items }) => (
+      <section class="group" aria-labelledby={`group-${line}`}>
+        <h2 class="group-title" id={`group-${line}`}>
+          {t.lines[line]}
+        </h2>
+
+        {items.map((item) => (
+          <article class="project" id={item.id}>
+            <div
+              class="project-main"
+              lang={
+                item.page.isFallback
+                  ? localeInfo[item.page.contentLocale].tag
+                  : undefined
+              }
+            >
+              <h3>
+                <a href={localizePath(`/work/${item.id}/`, locale)}>
+                  {item.page.entry.data.title}
+                </a>
+              </h3>
+              <p class="project-desc">{item.page.entry.data.summary}</p>
+              {item.links.length > 0 && (
+                <ul class="links">
+                  {item.links.map((link) => (
+                    <li>
+                      <a href={link.href}>{link.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div class="project-meta">
+              {item.since && <span>{formatMonth(item.since, locale)}</span>}
+            </div>
+          </article>
+        ))}
+      </section>
+    ))
+  }
+</BaseLayout>

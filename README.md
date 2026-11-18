@@ -16,77 +16,73 @@ npm run preview   # serves the built site
 
 Node 22.23 or newer is required.
 
+## What is where
+
+| Part of the site | Where its words live |
+|---|---|
+| Home introduction, Now, About | `src/content/pages/<language>/home.md`, `now.md`, `about.md` |
+| Work (one page per project) | `src/content/work/<language>/<id>.md`, plus facts in `src/data/work.ts` |
+| Notes | `src/content/notes/<language>/<name>.md` |
+| Menus, headings, short labels | `src/i18n/locales/<language>.ts` |
+| Outbound links | `src/data/links.ts` |
+
 ## Languages
 
 The site is published in English, Chinese, Japanese, Korean, Spanish, German,
-and Russian. English is the source and lives at the root (`/projects/`); the
-others live under their code (`/zh/projects/`, `/de/projects/`, …).
+and Russian. English is the source and lives at the root (`/work/`); the
+others live under their code (`/zh/work/`, `/de/work/`, …).
 
-- **Where the text is.** One file per language in `src/i18n/locales/`.
+- **Long text is Markdown, one folder per language.** Every file needs an
+  English version. A language that has no file of the same name shows the
+  English text with a one-line notice, so a page can go out before all seven
+  translations exist.
+- **Short interface text** is one file per language in `src/i18n/locales/`.
   `en.ts` defines the shape; every other file must have exactly the same
-  keys, or `npm run build` fails and names the missing key. To change or add
-  a sentence, edit `en.ts` first, then the other six.
-- **Links inside sentences** are written `[text](key)`, with keys from
-  `src/data/links.ts`; `[](key)` uses the link's own name. URLs are never
-  repeated in the language files.
-- **Pages** exist once, in `src/pages/[...locale]/`, and are built for every
-  language.
+  keys, or `npm run build` fails and names the missing key.
 - **Which language a visitor sees.** Opening an unprefixed (English) address
   sends a first-time visitor to their browser's language when the site has
   it. Choosing a language in the menu is remembered in that browser and wins
   from then on. An address that already carries a language code is shown as
   is.
+- **Links inside Markdown** to other pages of the site carry the language
+  themselves: `/work/hotaru/` in an English file, `/zh/work/hotaru/` in a
+  Chinese one.
 - **Adding a language.** Add its code to `locales` and `localeInfo` in
   `src/i18n/config.ts`, add `src/i18n/locales/<code>.ts`, and register it in
   `src/i18n/index.ts`. The type checker lists everything still missing.
 
-## Add a post
+## Update the Now page
 
-Create a Markdown file in `src/content/writing/en/`. The filename becomes the
-URL: `src/content/writing/en/on-mqtt-v5.md` is served at
-`/writing/on-mqtt-v5/`.
+Edit `src/content/pages/en/now.md` (and the other languages). Change
+`updated:` to today's date; `summary:` is the sentence shown on the home page.
+
+## Add a note
+
+Create `src/content/notes/en/<name>.md`; it is served at `/notes/<name>/`.
 
 ```md
 ---
 title: On MQTT v5
-description: One sentence for the writing index and link previews.
+description: One sentence for the notes index and link previews.
 date: 2026-09-01
 ---
 
 Body text starts here.
 ```
 
-`title`, `description`, and `date` are required. Add `draft: true` to keep a
-post out of the build. Posts are listed newest first; the empty state on
-`/writing/` disappears once the first one exists.
+Add `draft: true` to keep a note out of the build. To translate it, put a
+file with the same name in another language's folder.
 
-To translate a post, put a file with the **same filename** in another
-language's folder, e.g. `src/content/writing/zh/on-mqtt-v5.md`. Every post
-needs an English version; a language without its own version shows the
-English text with a one-line notice.
+## Add a piece of work
 
-## Add a project
+1. Add its facts to the `work` array in `src/data/work.ts`: an `id`, which of
+   the four lines it belongs to, an optional `since` month, and its links
+   (addresses go in `src/data/links.ts`). The array order is the display
+   order.
+2. Write `src/content/work/en/<id>.md` with a `title`, a one-sentence
+   `summary`, and the page body.
 
-1. Add the facts to the `projects` array in `src/data/projects.ts`:
-
-   ```ts
-   {
-     id: 'short-anchor',     // used as /projects/#short-anchor
-     kind: 'openSource',     // 'research' | 'openSource' | 'apps'
-     title: 'Project name',  // a proper name, shown as is in every language
-     date: '2026-08',        // optional; shown as a localized month
-     free: true,             // optional; shows the localized word for "Free"
-     links: [{ label: 'GitHub', href: 'https://github.com/…' }],
-   }
-   ```
-
-2. If it needs a description, a note, or a translated title, add
-   `projects.items['short-anchor']` to `src/i18n/locales/en.ts` and to the
-   other language files.
-
-The projects page groups entries by `kind` in the order research, open
-source, apps. The home page has its own short summary and does not read this
-file.
+The build stops if an id has no English page or a page has no id.
 
 ## Deploy
 

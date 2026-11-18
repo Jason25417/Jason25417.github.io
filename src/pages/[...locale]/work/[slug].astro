@@ -1,0 +1,80 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  defaultLocale,
+  formatMonth,
+  localeInfo,
+  locales,
+  localizePath,
+  useTranslations,
+  type Locale,
+} from '../../../i18n';
+import { getWork, type WorkEntry } from '../../../i18n/work';
+
+export async function getStaticPaths() {
+  const pages = [];
+  for (const locale of locales) {
+    for (const item of await getWork(locale)) {
+      pages.push({
+        params: {
+          locale: locale === defaultLocale ? undefined : locale,
+          slug: item.id,
+        },
+        props: { locale, item },
+      });
+    }
+  }
+  return pages;
+}
+
+interface Props {
+  locale: Locale;
+  item: WorkEntry;
+}
+
+const { locale, item } = Astro.props;
+const t = useTranslations(locale);
+const { page } = item;
+const { Content } = await render(page.entry);
+const { title, summary } = page.entry.data;
+const contentLang = page.isFallback
+  ? localeInfo[page.contentLocale].tag
+  : undefined;
+---
+
+<BaseLayout
+  title={title}
+  description={summary}
+  type="article"
+  translatedIn={page.translatedIn}
+  canonicalLocale={page.contentLocale}
+>
+  <article>
+    <header class="article-head">
+      <a class="back-link" href={localizePath('/work/', locale)}>← {t.work.title}</a>
+      <p class="eyebrow">{t.lines[item.line]}</p>
+      <h1 lang={contentLang}>{title}</h1>
+      <p class="lede" lang={contentLang}>{summary}</p>
+      <div class="article-meta">
+        {item.since && <span>{formatMonth(item.since, locale)}</span>}
+        {
+          item.links.length > 0 && (
+            <ul class="links">
+              {item.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+      {page.isFallback && <p class="notice">{t.common.englishOnly}</p>}
+    </header>
+
+    <div class="article-body prose" lang={contentLang}>
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
